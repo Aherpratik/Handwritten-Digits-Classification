@@ -239,7 +239,26 @@ def nnPredict(w1, w2, data):
     % label: a column vector of predicted labels"""
 
     labels = np.array([])
-    # Your code here
+    
+    Nm = data.shape[0]  # Total number of samples
+
+    # Adding  bias to the input data
+    Bias = np.hstack((data, np.ones((Nm, 1))))
+
+    # Giving Forward pass through hidden layer
+    fn = sigmoid(np.dot(Bias, w1.T))
+
+    # Adding  bias to the hidden layer output
+    fn = np.hstack((fn, np.ones((Nm, 1))))
+
+    # Giving Forward pass through output layer
+    ol = sigmoid(np.dot(fn, w2.T))
+
+    # Retrieving the greatest value index for every row (predicted class).
+    labels = np.argmax(ol, axis=1)
+
+    # Reshaping the  labels to  column vector
+    labels = labels.reshape(-1, 1)
 
     return labels
 
