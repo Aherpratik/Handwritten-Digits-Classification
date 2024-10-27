@@ -104,5 +104,6 @@ with tf.Session() as sess:
             avg_cost += c / total_batch
     print("Optimization Finished!")
     correct_prediction = tf.equal(tf.argmax(pred, 1), tf.argmax(y, 1))
-    accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
+    acc = tf.reduce_mean(tf.cast(correct_prediction, "float"))
+    accuracy = acc*100
     print("Accuracy:", accuracy.eval({x: test_features, y: test_labels}))
