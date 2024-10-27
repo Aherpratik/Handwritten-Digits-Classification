@@ -188,7 +188,7 @@ def nnObjFunction(params, *args):
 
     fn = np.hstack((fn, np.ones((Nm,1)))) #adding bias term to the hidden layer
 
-    ol = sigmoid(np.dot(z, w2.T)) #output layer usig the sigmoid activation function
+    ol = sigmoid(np.dot(fn, w2.T)) #output layer usig the sigmoid activation function
 
     #labels converting to the one-hot encoding
     y = np.zeros((N, n_class)) 
@@ -208,7 +208,7 @@ def nnObjFunction(params, *args):
     #Adding gradient for w1 and w2
 
     grad_w2 = np.dot(delta_o.T, z) / Nm + (lambdaval / Nm) * w2
-    delta_h = np.dot(delta_o, w2[:, :-1]) * z[:, :-1] * (1 - z[:, :-1])
+    delta_h = np.dot(delta_o, w2[:, :-1]) * fn[:, :-1] * (1 - fn[:, :-1])
     grad_w1 = np.dot(delta_h.T, Bias) / Nm + (lambdaval / Nm) * w1
 
     # Make sure you reshape the gradient matrices to a 1D array. for instance if your gradient matrices are grad_w1 and grad_w2
