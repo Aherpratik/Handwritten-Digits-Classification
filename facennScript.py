@@ -4,6 +4,7 @@ Comparing single layer MLP with deep MLP (using TensorFlow)
 
 import numpy as np
 import pickle
+from math import sqrt
 
 # Do not change this
 def initializeWeights(n_in,n_out):
@@ -36,17 +37,17 @@ def nnObjFunction(params, *args):
 
     Nm = training_data.shape[0] # Forward pass
 
-    Bias = np.hstack((training_data, np.ones(Nm, 1))) #adding bias to the input
-
+    Bias = np.hstack((training_data, np.ones((Nm, 1)))) #adding bias to the input
+    
     fn = sigmoid(np.dot(Bias,w1.T)) #Initalizing one hidden layer
 
     fn = np.hstack((fn, np.ones((Nm,1)))) #adding bias term to the hidden layer
 
-    ol = sigmoid(np.dot(z, w2.T)) #output layer usig the sigmoid activation function
+    ol = sigmoid(np.dot(fn, w2.T)) #output layer usig the sigmoid activation function
 
     #labels converting to the one-hot encoding
-    y = np.zeros((N, n_class)) 
-    y[np.arrange(N), training_label.astype(int)]=1
+    y = np.zeros((Nm, n_class)) 
+    y[np.arange(Nm), training_label.astype(int)]=1
 
     #computing the cross entropy loss(error)
     error = -np.sum(y * np.log(ol) + (1 - y) * np.log(1 - ol)) / Nm
@@ -61,8 +62,8 @@ def nnObjFunction(params, *args):
 
     #Adding gradient for w1 and w2
 
-    grad_w2 = np.dot(delta_o.T, z) / Nm + (lambdaval / Nm) * w2
-    delta_h = np.dot(delta_o, w2[:, :-1]) * z[:, :-1] * (1 - z[:, :-1])
+    grad_w2 = np.dot(delta_o.T, fn) / Nm + (lambdaval / Nm) * w2
+    delta_h = np.dot(delta_o, w2[:, :-1]) * fn[:, :-1] * (1 - fn[:, :-1])
     grad_w1 = np.dot(delta_h.T, Bias) / Nm + (lambdaval / Nm) * w1
 
     # Make sure you reshape the gradient matrices to a 1D array. for instance if your gradient matrices are grad_w1 and grad_w2
@@ -70,7 +71,7 @@ def nnObjFunction(params, *args):
     # obj_grad = np.concatenate((grad_w1.flatten(), grad_w2.flatten()),0)
 
     obj_grad = np.concatenate((grad_w1.flatten(), grad_w2.flatten()), 0)
-    obj_grad = np.array([])
+    obj_grad = np.array(obj_grad)
 
     return (obj_val, obj_grad)
 # Replace this with your nnPredict implementation
@@ -97,6 +98,7 @@ def nnPredict(w1,w2,data):
     # Reshaping the  labels to  column vector
     labels = labels.reshape(-1, 1)
 
+    return labels.flatten()
     return labels
 
 
