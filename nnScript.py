@@ -51,7 +51,7 @@ def preprocess():
      Some suggestions for preprocessing step:
      - feature selection"""
 
-    mat = loadmat('mnist_all.mat')  # loads the MAT object as a Dictionary
+    mat = loadmat('/Users/asmisawant/Downloads/Project 3/basecode/mnist_all.mat')  # loads the MAT object as a Dictionary
 
     # Pick a reasonable size for validation data
 
@@ -125,11 +125,7 @@ def preprocess():
     test_data = test_data / 255.0
     test_label = test_label_preprocess[test_perm]
 
-    # Feature selection
-     select = VarianceThreshold(Threshold=0.01)
-     train_data = selector.fit_transform(train_data)
-     validation_data = selector.transform(validation_data)
-     test_data = selector.transform(test_data)
+
 
     print('preprocess done')
 
@@ -182,7 +178,7 @@ def nnObjFunction(params, *args):
 
     Nm = training_data.shape[0] # Forward pass
 
-    Bias = np.hstack((training_data, np.ones(Nm, 1))) #adding bias to the input
+    Bias = np.hstack((training_data, np.ones((Nm, 1)))) #adding bias to the input
 
     fn = sigmoid(np.dot(Bias,w1.T)) #Initalizing one hidden layer
 
@@ -192,7 +188,7 @@ def nnObjFunction(params, *args):
 
     #labels converting to the one-hot encoding
     y = np.zeros((Nm, n_class)) 
-    y[np.arrange(Nm), training_label.astype(int)]=1
+    y[np.arange(Nm), training_label.astype(int)]=1
 
     #computing the cross entropy loss(error)
     error = -np.sum(y * np.log(ol) + (1 - y) * np.log(1 - ol)) / Nm
@@ -216,7 +212,7 @@ def nnObjFunction(params, *args):
     # obj_grad = np.concatenate((grad_w1.flatten(), grad_w2.flatten()),0)
 
     obj_grad = np.concatenate((grad_w1.flatten(), grad_w2.flatten()), 0)
-    obj_grad = np.array([])
+    obj_grad = np.array(obj_grad)
 
     return (obj_val, obj_grad)
 
