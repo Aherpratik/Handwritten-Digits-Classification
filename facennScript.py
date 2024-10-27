@@ -25,11 +25,80 @@ def initializeWeights(n_in,n_out):
 
 # Replace this with your sigmoid implementation
 def sigmoid(z):
+    return  1.0 / (1.0 + np.exp(-z))
 # Replace this with your nnObjFunction implementation
 def nnObjFunction(params, *args):
-    
+    n_input, n_hidden, n_class, training_data, training_label, lambdaval = args
+
+    w1 = params[0:n_hidden * (n_input + 1)].reshape((n_hidden, (n_input + 1)))
+    w2 = params[(n_hidden * (n_input + 1)):].reshape((n_class, (n_hidden + 1)))
+    obj_val = 0
+
+    Nm = training_data.shape[0] # Forward pass
+
+    Bias = np.hstack((training_data, np.ones(Nm, 1))) #adding bias to the input
+
+    fn = sigmoid(np.dot(Bias,w1.T)) #Initalizing one hidden layer
+
+    fn = np.hstack((fn, np.ones((Nm,1)))) #adding bias term to the hidden layer
+
+    ol = sigmoid(np.dot(z, w2.T)) #output layer usig the sigmoid activation function
+
+    #labels converting to the one-hot encoding
+    y = np.zeros((N, n_class)) 
+    y[np.arrange(N), training_label.astype(int)]=1
+
+    #computing the cross entropy loss(error)
+    error = -np.sum(y * np.log(ol) + (1 - y) * np.log(1 - ol)) / Nm
+
+    #L2 regularization
+    reg_term = (lambdaval / (2 * Nm)) * (np.sum(w1 * w1) + np.sum(w2 * w2))
+
+    #The sum  of the error and relarization term
+    obj_val = error + reg_term
+
+    delta_o = ol - y #Backpropagating
+
+    #Adding gradient for w1 and w2
+
+    grad_w2 = np.dot(delta_o.T, z) / Nm + (lambdaval / Nm) * w2
+    delta_h = np.dot(delta_o, w2[:, :-1]) * z[:, :-1] * (1 - z[:, :-1])
+    grad_w1 = np.dot(delta_h.T, Bias) / Nm + (lambdaval / Nm) * w1
+
+    # Make sure you reshape the gradient matrices to a 1D array. for instance if your gradient matrices are grad_w1 and grad_w2
+    # you would use code similar to the one below to create a flat array
+    # obj_grad = np.concatenate((grad_w1.flatten(), grad_w2.flatten()),0)
+
+    obj_grad = np.concatenate((grad_w1.flatten(), grad_w2.flatten()), 0)
+    obj_grad = np.array([])
+
+    return (obj_val, obj_grad)
 # Replace this with your nnPredict implementation
 def nnPredict(w1,w2,data):
+    labels = np.array([])
+    
+    Nm = data.shape[0]  # Total number of samples
+
+    # Adding  bias to the input data
+    Bias = np.hstack((data, np.ones((Nm, 1))))
+
+    # Giving Forward pass through hidden layer
+    fn = sigmoid(np.dot(Bias, w1.T))
+
+    # Adding  bias to the hidden layer output
+    fn = np.hstack((fn, np.ones((Nm, 1))))
+
+    # Giving Forward pass through output layer
+    ol = sigmoid(np.dot(fn, w2.T))
+
+    # Retrieving the greatest value index for every row (predicted class).
+    labels = np.argmax(ol, axis=1)
+
+    # Reshaping the  labels to  column vector
+    labels = labels.reshape(-1, 1)
+
+    return labels
+
 
 # Do not change this
 def preprocess():
