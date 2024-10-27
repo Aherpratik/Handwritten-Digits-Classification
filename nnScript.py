@@ -1,8 +1,9 @@
 import numpy as np
 from scipy.optimize import minimize
 from scipy.io import loadmat
-from math import sqrt
+from sklearn.preprocessing import StandardScaler
 from sklearn.feature_selection import VarianceThreshold
+from math import sqrt
 
 
 def initializeWeights(n_in, n_out):
@@ -51,7 +52,7 @@ def preprocess():
      Some suggestions for preprocessing step:
      - feature selection"""
 
-    mat = loadmat('/Users/asmisawant/Downloads/Project 3/basecode/mnist_all.mat')  # loads the MAT object as a Dictionary
+    mat = loadmat('/Users/pratikaher01/Downloads/Handwritten_Digit_Identification/mnist_all.mat')  # loads the MAT object as a Dictionary
 
     # Pick a reasonable size for validation data
 
@@ -125,9 +126,20 @@ def preprocess():
     test_data = test_data / 255.0
     test_label = test_label_preprocess[test_perm]
 
+   
 
+    def featureSelection(data):
+        features = []
+        D = data.shape[1] #Total d features
+        for x in range(D):
+            if sum(data[:, x]) > 0:
+                features += [x]
+        return features 
+    
+    
 
     print('preprocess done')
+    
 
     return train_data, train_label, validation_data, validation_label, test_data, test_label
 
@@ -179,7 +191,7 @@ def nnObjFunction(params, *args):
     Nm = training_data.shape[0] # Forward pass
 
     Bias = np.hstack((training_data, np.ones((Nm, 1)))) #adding bias to the input
-
+    
     fn = sigmoid(np.dot(Bias,w1.T)) #Initalizing one hidden layer
 
     fn = np.hstack((fn, np.ones((Nm,1)))) #adding bias term to the hidden layer
@@ -256,6 +268,7 @@ def nnPredict(w1, w2, data):
     # Reshaping the  labels to  column vector
     labels = labels.reshape(-1, 1)
 
+    return labels.flatten()
     return labels
 
 
@@ -269,7 +282,7 @@ train_data, train_label, validation_data, validation_label, test_data, test_labe
 n_input = train_data.shape[1]
 
 # set the number of nodes in hidden unit (not including bias unit)
-n_hidden = 50
+n_hidden = 100
 
 # set the number of nodes in output unit
 n_class = 10
@@ -282,7 +295,7 @@ initial_w2 = initializeWeights(n_hidden, n_class)
 initialWeights = np.concatenate((initial_w1.flatten(), initial_w2.flatten()), 0)
 
 # set the regularization hyper-parameter
-lambdaval = 0
+lambdaval = 0.01
 
 args = (n_input, n_hidden, n_class, train_data, train_label, lambdaval)
 
@@ -306,6 +319,8 @@ w2 = nn_params.x[(n_hidden * (n_input + 1)):].reshape((n_class, (n_hidden + 1)))
 predicted_label = nnPredict(w1, w2, train_data)
 
 # find the accuracy on Training Dataset
+print("Shape of predicted_label:", predicted_label.shape)
+print("Shape of train_label:", train_label.shape)
 
 print('\n Training set Accuracy:' + str(100 * np.mean((predicted_label == train_label).astype(float))) + '%')
 
