@@ -191,8 +191,8 @@ def nnObjFunction(params, *args):
     ol = sigmoid(np.dot(fn, w2.T)) #output layer usig the sigmoid activation function
 
     #labels converting to the one-hot encoding
-    y = np.zeros((N, n_class)) 
-    y[np.arrange(N), training_label.astype(int)]=1
+    y = np.zeros((Nm, n_class)) 
+    y[np.arrange(Nm), training_label.astype(int)]=1
 
     #computing the cross entropy loss(error)
     error = -np.sum(y * np.log(ol) + (1 - y) * np.log(1 - ol)) / Nm
@@ -207,7 +207,7 @@ def nnObjFunction(params, *args):
 
     #Adding gradient for w1 and w2
 
-    grad_w2 = np.dot(delta_o.T, z) / Nm + (lambdaval / Nm) * w2
+    grad_w2 = np.dot(delta_o.T, fn) / Nm + (lambdaval / Nm) * w2
     delta_h = np.dot(delta_o, w2[:, :-1]) * fn[:, :-1] * (1 - fn[:, :-1])
     grad_w1 = np.dot(delta_h.T, Bias) / Nm + (lambdaval / Nm) * w1
 
