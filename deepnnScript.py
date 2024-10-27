@@ -2,7 +2,9 @@
 Comparing single layer MLP with deep MLP (using TensorFlow)
 '''
 
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
+#from tensorflow import random_normal
 import numpy as np
 import pickle
 
@@ -45,7 +47,7 @@ def create_multilayer_perceptron():
 
 # Do not change this
 def preprocess():
-    pickle_obj = pickle.load(file=open('face_all.pickle', 'rb'))
+    pickle_obj = pickle.load(file=open('/Users/pratikaher01/Downloads/Handwritten_Digit_Identification/face_all.pickle', 'rb'))
     features = pickle_obj['Features']
     labels = pickle_obj['Labels']
     train_x = features[0:21100] / 255
