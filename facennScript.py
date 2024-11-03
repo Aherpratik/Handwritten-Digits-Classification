@@ -5,6 +5,7 @@ Comparing single layer MLP with deep MLP (using TensorFlow)
 import numpy as np
 import pickle
 from math import sqrt
+from scipy.optimize import minimize
 
 # Do not change this
 def initializeWeights(n_in,n_out):
