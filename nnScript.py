@@ -4,6 +4,11 @@ from scipy.io import loadmat
 from sklearn.preprocessing import StandardScaler
 from sklearn.feature_selection import VarianceThreshold
 from math import sqrt
+import time
+import pickle
+from sklearn.metrics import confusion_matrix
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 
 def initializeWeights(n_in, n_out):
@@ -52,7 +57,7 @@ def preprocess():
      Some suggestions for preprocessing step:
      - feature selection"""
 
-    mat = loadmat('/Users/pratikaher01/Downloads/Handwritten_Digit_Identification/mnist_all.mat')  # loads the MAT object as a Dictionary
+    mat = loadmat('/Users/asmisawant/Downloads/Project 3/basecode/mnist_all.mat')  # loads the MAT object as a Dictionary
 
     # Pick a reasonable size for validation data
 
@@ -136,12 +141,15 @@ def preprocess():
                 features += [x]
         return features 
     
-    
+    features = featureSelection(train_data)
+    train_data = train_data[:, features]
+    validation_data = validation_data[:, features]
+    test_data = test_data[:, features]
 
     print('preprocess done')
     
 
-    return train_data, train_label, validation_data, validation_label, test_data, test_label
+    return train_data, train_label, validation_data, validation_label, test_data, test_label, features
 
 
 def nnObjFunction(params, *args):
@@ -274,7 +282,7 @@ def nnPredict(w1, w2, data):
 
 """**************Neural Network Script Starts here********************************"""
 
-train_data, train_label, validation_data, validation_label, test_data, test_label = preprocess()
+train_data, train_label, validation_data, validation_label, test_data, test_label, features = preprocess()
 
 #  Train Neural Network
 
@@ -295,7 +303,9 @@ initial_w2 = initializeWeights(n_hidden, n_class)
 initialWeights = np.concatenate((initial_w1.flatten(), initial_w2.flatten()), 0)
 
 # set the regularization hyper-parameter
-lambdaval = 0.01
+lambdaval = 4
+
+time1 = time.time()
 
 args = (n_input, n_hidden, n_class, train_data, train_label, lambdaval)
 
@@ -335,3 +345,31 @@ predicted_label = nnPredict(w1, w2, test_data)
 # find the accuracy on Validation Dataset
 
 print('\n Test set Accuracy:' + str(100 * np.mean((predicted_label == test_label).astype(float))) + '%')
+
+#confusion matrix to show accuracy
+test_predicted = nnPredict(w1, w2, test_data)
+cm = confusion_matrix(test_label, test_predicted)
+
+# Plot the confusion matrix
+sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=range(10), yticklabels=range(10))
+plt.xlabel("Predicted Labels")
+plt.ylabel("True Labels")
+plt.title("Confusion Matrix for neural network")
+plt.show()
+
+# To find the training time of the Neural network
+time2 = time.time()
+print('\n Training Time:'+ str(time2 -time1 ) )
+
+
+obj = {
+    'selected_features': features,
+    'no_of_hidden_layers': n_hidden,
+    'w1': w1,
+    'w2': w2,
+    'value_of_lambda': lambdaval
+}
+
+with open('params.pickle', 'wb') as file:
+    pickle.dump(obj, file)
+print("params.pickle file is created")
