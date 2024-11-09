@@ -6,6 +6,7 @@ import numpy as np
 import pickle
 from math import sqrt
 from scipy.optimize import minimize
+import time 
 
 # Do not change this
 def initializeWeights(n_in,n_out):
@@ -124,9 +125,9 @@ train_data, train_label, validation_data, validation_label, test_data, test_labe
 # set the number of nodes in input unit (not including bias unit)
 n_input = train_data.shape[1]
 # set the number of nodes in hidden unit (not including bias unit)
-n_hidden = 256
+n_hidden = 50
 # set the number of nodes in output unit
-n_class = 2
+n_class = 10
 
 # initialize the weights into some random matrices
 initial_w1 = initializeWeights(n_input, n_hidden);
@@ -134,7 +135,8 @@ initial_w2 = initializeWeights(n_hidden, n_class);
 # unroll 2 weight matrices into single column vector
 initialWeights = np.concatenate((initial_w1.flatten(), initial_w2.flatten()),0)
 # set the regularization hyper-parameter
-lambdaval = 10;
+lambdaval = 0;
+time1 = time.time()
 args = (n_input, n_hidden, n_class, train_data, train_label, lambdaval)
 
 #Train Neural Network using fmin_cg or minimize from scipy,optimize module. Check documentation for a working example
@@ -156,3 +158,17 @@ print('\n Validation set Accuracy:' + str(100*np.mean((predicted_label == valida
 predicted_label = nnPredict(w1,w2,test_data)
 #find the accuracy on Validation Dataset
 print('\n Test set Accuracy:' +  str(100*np.mean((predicted_label == test_label).astype(float))) + '%')
+
+time2 = time.time()
+print('\n Training time:'+str(time2-time1))
+
+obj = {
+    'no_of_hidden_layers': n_hidden,
+    'w1': w1,
+    'w2': w2,
+    'value_of_lambda': lambdaval
+}
+
+with open('face_params.pickle', 'wb') as file:
+    pickle.dump(obj, file)
+print("face_params.pickle file is created")
